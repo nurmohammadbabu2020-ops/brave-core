@@ -9,7 +9,6 @@
 
 #include "chrome/browser/speech/on_device_speech_recognition_impl.h"
 
-#include <algorithm>
 #include <memory>
 #include <optional>
 #include <string>
@@ -17,6 +16,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/check.h"
 #include "base/containers/span.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
@@ -44,23 +44,36 @@ media::mojom::AvailabilityStatus GetBraveOnDeviceSpeechAvailability(
 
 namespace {
 
-// Whether `Install` prompts before it downloads: only when it would start one.
-// Once the model is enabled it does not prompt, which lets `Install` run again
-// after the user allows it.
-bool ShouldPromptForBraveOnDeviceSpeechModel(
+// The model `Install` prompts for before it downloads one: the first model
+// a language needs that is downloadable and not enabled. None when upstream
+// refuses one of `languages`, because a prompt would be for nothing. Once a
+// model is enabled it does not prompt for it, which lets `Install` run again
+// after the user allows it, and then prompt for the next model.
+std::optional<local_ai::OnDeviceSpeechModel> GetBraveOnDeviceSpeechModelToAsk(
     content::BrowserContext* context,
     base::span<const std::string> languages,
     media::mojom::SpeechRecognitionQuality quality) {
-  if (languages.empty() || local_ai::ShouldInstallOnDeviceSpeechModel(
-                               g_browser_process->local_state(),
-                               local_ai::OnDeviceSpeechModel::kEnglish)) {
-    return false;
+  std::optional<local_ai::OnDeviceSpeechModel> model_to_ask;
+  for (const std::string& language : languages) {
+    const media::mojom::AvailabilityStatus availability =
+        GetBraveOnDeviceSpeechAvailability(context, language, quality);
+    if (availability == media::mojom::AvailabilityStatus::kUnavailable) {
+      return std::nullopt;
+    }
+    if (model_to_ask ||
+        availability != media::mojom::AvailabilityStatus::kDownloadable) {
+      continue;
+    }
+    // Only a language that a model serves is downloadable.
+    const local_ai::OnDeviceSpeechLocale* locale =
+        local_ai::ResolveOnDeviceSpeechLocale(language);
+    CHECK(locale);
+    if (!local_ai::ShouldInstallOnDeviceSpeechModel(
+            g_browser_process->local_state(), locale->model)) {
+      model_to_ask = locale->model;
+    }
   }
-  return std::ranges::all_of(
-      languages, [context, quality](const std::string& language) {
-        return GetBraveOnDeviceSpeechAvailability(context, language, quality) ==
-               media::mojom::AvailabilityStatus::kDownloadable;
-      });
+  return model_to_ask;
 }
 
 // Answers the prompt that `PromptForBraveOnDeviceSpeechModel` shows. Runs
@@ -77,10 +90,12 @@ void OnPromptAnswered(
   std::move(install).Run(std::move(callback));
 }
 
-// Runs `install` with `callback` once the user allows it, and otherwise answers
-// false. "Don't ask again" is answered without a prompt.
+// Asks to download `model`. Runs `install` with `callback` once the user allows
+// it, and otherwise answers false. "Don't ask again" is answered without a
+// prompt.
 void PromptForBraveOnDeviceSpeechModel(
     content::RenderFrameHost& rfh,
+    local_ai::OnDeviceSpeechModel model,
     base::OnceCallback<void(base::OnceCallback<void(bool)>)> install,
     base::OnceCallback<void(bool)> callback) {
   Profile* profile = Profile::FromBrowserContext(rfh.GetBrowserContext());
@@ -94,7 +109,7 @@ void PromptForBraveOnDeviceSpeechModel(
 
   manager->AddRequest(
       &rfh, std::make_unique<OnDeviceSpeechModelPermissionRequest>(
-                *g_browser_process->local_state(), *profile->GetPrefs(),
+                model, *g_browser_process->local_state(), *profile->GetPrefs(),
                 rfh.GetLastCommittedOrigin().GetURL(),
                 base::BindOnce(&OnPromptAnswered, std::move(install),
                                std::move(callback))));
@@ -163,7 +178,7 @@ bool MaybeHandleBraveOnDeviceSpeechAvailable(
 // Runs first in `Install`. Cancels `Install` in a Private, Tor or Guest
 // profile, or when no locale serves one of `languages`. Runs `Install` again
 // with the locales' tags when they differ from `languages`. Otherwise prompts
-// before `Install` starts a download of Brave's model, and runs `Install` again
+// before `Install` starts a download of a model, and runs `Install` again
 // once the user allows it. Returns true when it cancels, runs `Install` again
 // or prompts, and only then takes `callback`. Otherwise maps `quality` for
 // upstream's SODA branch, and lets upstream answer.
@@ -197,10 +212,13 @@ bool MaybeHandleBraveOnDeviceSpeechInstall(
     impl->Install(*tags, quality, std::move(callback));
     return true;
   }
-  if (frame_can_use_on_device_speech &&
-      ShouldPromptForBraveOnDeviceSpeechModel(context, languages, quality)) {
+  const std::optional<local_ai::OnDeviceSpeechModel> model =
+      frame_can_use_on_device_speech
+          ? GetBraveOnDeviceSpeechModelToAsk(context, languages, quality)
+          : std::nullopt;
+  if (model) {
     PromptForBraveOnDeviceSpeechModel(
-        rfh,
+        rfh, *model,
         base::BindOnce(&OnDeviceSpeechRecognitionImpl::Install, std::move(impl),
                        languages, quality),
         std::move(callback));
