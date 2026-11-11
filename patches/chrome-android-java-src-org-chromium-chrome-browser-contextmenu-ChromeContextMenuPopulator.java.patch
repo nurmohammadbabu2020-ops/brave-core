@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java
-index 44274b0b8f1d1aab2ce06f0eead39287da8bc3b6..fd999276c1d50049c7ffa4a30b363168a9891287 100644
+index 554c9e87bd1feecd7034923a7e008402e36c829d..59370ef7d55c19311c3a06ba8f389d706244bf3f 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java
 @@ -277,6 +277,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
@@ -20,11 +20,11 @@ index 44274b0b8f1d1aab2ce06f0eead39287da8bc3b6..fd999276c1d50049c7ffa4a30b363168
          }
  
          // LINT.ThenChange(/tools/metrics/histograms/enums.xml:ContextMenuOptionAndroid)
-@@ -734,6 +736,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
+@@ -741,6 +743,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
              if (!MailTo.isMailTo(mParams.getLinkUrl().getSpec())
                      && !UrlUtilities.isTelScheme(mParams.getLinkUrl())) {
                  linkGroup.add(createListItem(Item.COPY_LINK_ADDRESS));
 +                linkGroup.add(createListItem(Item.COPY_CLEAN_LINK));
-                 if (!mParams.getLinkText().trim().isEmpty() && !mParams.isImage()) {
-                     linkGroup.add(createListItem(Item.COPY_LINK_TEXT));
-                 }
+                 if (!mParams.getLinkText().trim().isEmpty()
+                         && !mParams.isImage()
+                         && !mParams.isCanvas()) {
