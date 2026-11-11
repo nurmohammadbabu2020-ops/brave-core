@@ -42,7 +42,7 @@ agentic_review {
     rules: "tools/cr/codehealth/rules/enforcement/scripted-cleanups.md"
   }
   capability_groups {
-    body_patterns: "(?i)preempt|upcoming (?:clang|presubmit|plugin)|will be disallowed|\\bLSC\\b|is being deprecated|in preparation (?:for|of)"
+    body_patterns: "(?i)preempt|upcoming (?:\\w+ ){0,2}(?:clang|presubmit|plugin)|will be disallowed|\\bLSC\\b|is being deprecated|in preparation (?:for|of)"
     rules: "tools/cr/codehealth/rules/enforcement/commit-body-announcements.md"
   }
 }

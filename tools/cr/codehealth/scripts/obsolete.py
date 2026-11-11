@@ -902,6 +902,10 @@ class RemovedNames:
     )
     _FEATURE = re.compile(r'^X\("(\w+)"\)', re.M)
     _FEATURES = 'base/compile_overridden_features.inc'
+    _BLINK_RUNTIME_FEATURES_PLASTER = (
+        'rewrite/third_party/blink/renderer/platform/'
+        'runtime_enabled_features.json5.yaml'
+    )
     # The names a replaced header declares: constants and functions.
     _NAME = re.compile(r'\b(k[A-Z]\w+|[A-Z]\w+(?=\s*\())')
     _COMMENT = re.compile(r'//[^\n]*|/\*.*?\*/', re.S)
@@ -1153,13 +1157,25 @@ class RemovedNames:
         """Features Brave overrides that upstream no longer declares."""
         text = self._range.brave.show(self._FEATURES) or ''
         names = set(self._FEATURE.findall(text))
-        # Brave's own features: those Brave declares.
+        # Brave's own features: those Brave declares, or gives a Blink
+        # runtime feature through the json5 plaster (`base_feature: "X"`).
         names -= {
             needle[len('FEATURE(k') :]
             for needle in self._brave_locations(
                 {f'FEATURE(k{n}' for n in names}, words=False
             )
         }
+        with self._pattern_file({f'"{n}"' for n in names}) as patterns:
+            names -= {
+                text.strip('"')
+                for _, _, text in self._range.brave.grep_lines(
+                    '-o',
+                    '-F',
+                    '-f',
+                    patterns,
+                    paths=(self._BLINK_RUNTIME_FEATURES_PLASTER,),
+                )
+            }
         needles = {f'"{n}"' for n in names} | {f'k{n}' for n in names}
         old = self._present_fixed(self._range.old, needles)
         new = self._present_fixed(self._range.new, needles)
@@ -1173,7 +1189,8 @@ class RemovedNames:
         return lines
 
     def _present_fixed(self, tag: str, needles: set[str]) -> set[str]:
-        """The needles the C++ sources spell anywhere at `tag`."""
+        """The needles the C++ sources, and the json5 lists that generate
+        features, spell anywhere at `tag`."""
         with self._pattern_file(needles) as patterns:
             out = self._range.chromium.run(
                 'grep',
@@ -1188,6 +1205,7 @@ class RemovedNames:
                 '*.cc',
                 '*.h',
                 '*.mm',
+                '*.json5',
             )
         return set(out.splitlines())
 

@@ -11,6 +11,14 @@ agentic_review {
     rules: "tools/cr/codehealth/rules/defaults/feature-defaults-unittest-entries.md"
     rules: "tools/cr/codehealth/rules/defaults/pins-equal-to-upstream-default.md"
   }
+  # Flips through a new `#else` branch, which keeps the old default as context.
+  capability_groups {
+    path_expression: ".*\\.(?:cc|h|mm)"
+    path_expression_exclusion: ".*(?:_unittest|_browsertest|_test|_uitest|_test_util|_test_utils|_fuzzer|_perftest)\\.(?:cc|h|mm)|.*/test/.*|.*/testing/.*|.*about_flags\\.cc"
+    diff_patterns: "^\\+#\\s*else\\b"
+    required_diff_patterns: "^\\+.*FEATURE_(?:EN|DIS)ABLED_(?:BY_DEFAULT|FOR_COUNTRIES)"
+    rules: "tools/cr/codehealth/rules/defaults/feature-flips.md"
+  }
   # New IPHs that ship enabled: Brave pins IPHs one by one, and a new feature
   # only adds a default, which the flips group above requires to be removed too.
   capability_groups {

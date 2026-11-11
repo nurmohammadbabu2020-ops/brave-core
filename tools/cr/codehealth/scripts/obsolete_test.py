@@ -764,6 +764,57 @@ class RemovedNamesTest(unittest.TestCase):
             RemovedNames(FakeRange(brave, chromium)).headers(),
         )
 
+    def test_features_generated_from_json5_are_upstream(self) -> None:
+        with tempfile.TemporaryDirectory() as root:
+            chromium, brave = Path(root, 'src'), Path(root, 'brave')
+
+            def git(cwd: Path, *args: str) -> None:
+                subprocess.run(
+                    [
+                        'git',
+                        '-C',
+                        str(cwd),
+                        '-c',
+                        'user.name=t',
+                        '-c',
+                        'user.email=t@t',
+                        *args,
+                    ],
+                    check=True,
+                    capture_output=True,
+                )
+
+            for repo in (chromium, brave):
+                repo.mkdir()
+                git(repo, 'init', '-q', '-b', 'main')
+            (chromium / 'a.json5').write_text('{ name: "ProfilerAPI" }\n')
+            git(chromium, 'add', '.')
+            git(chromium, 'commit', '-q', '-m', 'old')
+            git(chromium, 'tag', 'old')
+            git(chromium, 'tag', 'new')
+            (brave / 'base').mkdir()
+            (brave / 'base/compile_overridden_features.inc').write_text(
+                'X("ProfilerAPI")\nX("BravePlastered")\nX("Gone")\n'
+            )
+            plaster = brave / (
+                'rewrite/third_party/blink/renderer/platform/'
+                'runtime_enabled_features.json5.yaml'
+            )
+            plaster.parent.mkdir(parents=True)
+            plaster.write_text("replace: 'base_feature: \"BravePlastered\",'\n")
+            git(brave, 'add', '.')
+            git(brave, 'commit', '-q', '-m', 'brave')
+            features = RemovedNames(
+                FakeRange(Git(brave), Git(chromium))
+            ).features()
+        self.assertEqual(
+            [
+                'feature\tbase/compile_overridden_features.inc\tGone'
+                '\tmissing at both'
+            ],
+            features,
+        )
+
     def test_rows_predating_the_range_are_counted(self):
         removed = RemovedNames(FakeRange())
         with (
