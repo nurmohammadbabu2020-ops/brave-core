@@ -943,10 +943,10 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 -      .chips="\${this.getVisibleChips_(this.hierarchy_.travel.chips)}">
 +  <category-reference-card id="travelManagerButton" card-title="$i18n{travelCardTitle}" .categoryId="\${this.hierarchy_.travel.id}" .chips="\${this.getVisibleChips_(this.hierarchy_.travel.chips)}" hidden="">
    </category-reference-card>
-   \${this.isShoppingEnabled_ ? html\`
-     <category-reference-card id="shoppingManagerButton"
-         card-title="$i18n{shoppingCardTitle}"
-@@ -56,27 +44,22 @@
+   \${this.isOffersAndLoyaltyCardsEnabled_ ? html\`
+     <category-reference-card id="offersAndLoyaltyCardsManagerButton"
+         card-title="$i18n{offersAndLoyaltyCardsCardTitle}"
+@@ -64,27 +52,22 @@
          $i18n{autofillPersonalContextSettingsSummary}
        </div>
      </div>
@@ -1042,8 +1042,8 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 @@ -55,17 +39,13 @@
    </div>
    <div class="card">
-     <div class="cr-row continuation">
-       <h2 class="flex">$i18n{addresses}</h2>
+     <div class="cr-row continuation section-header-row">
+       <h2 class="flex section-header">$i18n{addresses}</h2>
 -      <cr-button id="addAddress" class="header-aligned-button"
 -          @click="\${this.onAddAddressClick_}"
 -          aria-label="$i18n{addAddressTitle}"
@@ -1078,11 +1078,11 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
    </div>
 -  <div class="card">
 +  <div class="card" hidden="">
-     <div class="cr-row continuation">
-       <h2 class="flex">$i18n{emailVerificationSectionTitle}</h2>
+     <div class="cr-row continuation section-header-row">
+       <h2 class="flex section-header">$i18n{emailVerificationSectionTitle}</h2>
      </div>
      \${this.isEmailVerificationProtocolEnabled_ ? html\`
-@@ -221,10 +200,9 @@
+@@ -222,10 +201,9 @@
          $i18n{emailVerificationEmptyLabel}
        </div>
      \` : ''}
@@ -1985,7 +1985,7 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 "===================================================================
 --- ../chrome/browser/resources/settings/performance_page/memory_page.html.ts
 +++ gen/chrome/browser/resources/settings/preprocessed/performance_page/memory_page.html.ts
-@@ -4,47 +4,27 @@
+@@ -4,48 +4,28 @@
  import {MemorySaverModeAggressiveness} from './performance_metrics_proxy.js';
  
  export function getHtml(this: SettingsMemoryPageElement) {
@@ -1993,55 +1993,56 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 -<settings-section ?show-send-feedback-button="\${this.showSendFeedbackButton_()}"
 -    @send-feedback="\${this.onSendFeedback_}"
 -    page-title="$i18n{memoryPageTitle}">
--  <settings-toggle-button id="toggleButton"
--      @change="\${this.onMemorySaverModeChange_}"
--      pref-key="performance_tuning.high_efficiency_mode.state"
--      label="$i18n{memorySaverModeLabel}"
--      sub-label-with-link="$i18n{memorySaverModeDescription}"
--      @sub-label-link-clicked="\${this.onMemorySaverSubLabelLinkClicked_}"
--      .numericUncheckedValues="\${this.numericUncheckedValues_}"
--      .numericCheckedValue="\${this.numericCheckedValue_}">
 +<settings-section ?show-send-feedback-button="\${this.showSendFeedbackButton_()}" @send-feedback="\${this.onSendFeedback_}" page-title="$i18n{memoryPageTitle}"><tab-discard-exception-list id="exceptionList">
 +     </tab-discard-exception-list>
 +     <div class="hr"></div>
-+  <settings-toggle-button id="toggleButton" @change="\${this.onMemorySaverModeChange_}" pref-key="performance_tuning.high_efficiency_mode.state" label="$i18n{memorySaverModeLabel}" sub-label-with-link="$i18n{memorySaverModeDescription}" @sub-label-link-clicked="\${this.onMemorySaverSubLabelLinkClicked_}" .numericUncheckedValues="\${this.numericUncheckedValues_}" .numericCheckedValue="\${this.numericCheckedValue_}">
-   </settings-toggle-button>
--  <cr-collapse id="radioGroupCollapse"
--      ?opened="\${this.isMemorySaverModeEnabled_()}">
-+  <cr-collapse id="radioGroupCollapse" ?opened="\${this.isMemorySaverModeEnabled_()}">
-     <div class="cr-row continuation memory-saver-radio-group">
--      <settings-radio-group id="radioGroup"
--          @change="\${this.onMemorySaverModeAggressivenessChange_}"
--          pref-key="performance_tuning.high_efficiency_mode.aggressiveness"
--          group-aria-label="$i18n{memorySaverModeRadioGroupAriaLabel}">
--        <controlled-radio-button id="conservativeButton"
--            label="$i18n{memorySaverModeConservativeLabel}"
--            name="\${MemorySaverModeAggressiveness.CONSERVATIVE}"
--            pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
-+      <settings-radio-group id="radioGroup" @change="\${this.onMemorySaverModeAggressivenessChange_}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness" group-aria-label="$i18n{memorySaverModeRadioGroupAriaLabel}">
-+        <controlled-radio-button id="conservativeButton" label="$i18n{memorySaverModeConservativeLabel}" name="\${MemorySaverModeAggressiveness.CONSERVATIVE}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
-           <div class="cr-secondary-text">
-             $i18n{memorySaverModeConservativeDescription}
-           </div>
-         </controlled-radio-button>
--        <controlled-radio-button id="mediumButton"
--            label="$i18n{memorySaverModeMediumLabel}"
--            name="\${MemorySaverModeAggressiveness.MEDIUM}"
--            pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
-+        <controlled-radio-button id="mediumButton" label="$i18n{memorySaverModeMediumLabel}" name="\${MemorySaverModeAggressiveness.MEDIUM}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
-           <div class="cr-secondary-text">
-             $i18n{memorySaverModeMediumDescription}
-           </div>
-         </controlled-radio-button>
--        <controlled-radio-button id="aggressiveButton"
--            label="$i18n{memorySaverModeAggressiveLabel}"
--            name="\${MemorySaverModeAggressiveness.AGGRESSIVE}"
--            pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
-+        <controlled-radio-button id="aggressiveButton" label="$i18n{memorySaverModeAggressiveLabel}" name="\${MemorySaverModeAggressiveness.AGGRESSIVE}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
-           <div class="cr-secondary-text">
-             $i18n{memorySaverModeAggressiveDescription}
-           </div>
-         </controlled-radio-button>
+   <div>
+-    <settings-toggle-button id="toggleButton"
+-        @change="\${this.onMemorySaverModeChange_}"
+-        pref-key="performance_tuning.high_efficiency_mode.state"
+-        label="$i18n{memorySaverModeLabel}"
+-        sub-label-with-link="$i18n{memorySaverModeDescription}"
+-        @sub-label-link-clicked="\${this.onMemorySaverSubLabelLinkClicked_}"
+-        .numericUncheckedValues="\${this.numericUncheckedValues_}"
+-        .numericCheckedValue="\${this.numericCheckedValue_}">
++    <settings-toggle-button id="toggleButton" @change="\${this.onMemorySaverModeChange_}" pref-key="performance_tuning.high_efficiency_mode.state" label="$i18n{memorySaverModeLabel}" sub-label-with-link="$i18n{memorySaverModeDescription}" @sub-label-link-clicked="\${this.onMemorySaverSubLabelLinkClicked_}" .numericUncheckedValues="\${this.numericUncheckedValues_}" .numericCheckedValue="\${this.numericCheckedValue_}">
+     </settings-toggle-button>
+-    <cr-collapse id="radioGroupCollapse"
+-        ?opened="\${this.isMemorySaverModeEnabled_()}">
++    <cr-collapse id="radioGroupCollapse" ?opened="\${this.isMemorySaverModeEnabled_()}">
+       <div class="cr-row continuation memory-saver-radio-group">
+-        <settings-radio-group id="radioGroup"
+-            @change="\${this.onMemorySaverModeAggressivenessChange_}"
+-            pref-key="performance_tuning.high_efficiency_mode.aggressiveness"
+-            group-aria-label="$i18n{memorySaverModeRadioGroupAriaLabel}">
+-          <controlled-radio-button id="conservativeButton"
+-              label="$i18n{memorySaverModeConservativeLabel}"
+-              name="\${MemorySaverModeAggressiveness.CONSERVATIVE}"
+-              pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
++        <settings-radio-group id="radioGroup" @change="\${this.onMemorySaverModeAggressivenessChange_}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness" group-aria-label="$i18n{memorySaverModeRadioGroupAriaLabel}">
++          <controlled-radio-button id="conservativeButton" label="$i18n{memorySaverModeConservativeLabel}" name="\${MemorySaverModeAggressiveness.CONSERVATIVE}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
+             <div class="cr-secondary-text">
+               $i18n{memorySaverModeConservativeDescription}
+             </div>
+           </controlled-radio-button>
+-          <controlled-radio-button id="mediumButton"
+-              label="$i18n{memorySaverModeMediumLabel}"
+-              name="\${MemorySaverModeAggressiveness.MEDIUM}"
+-              pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
++          <controlled-radio-button id="mediumButton" label="$i18n{memorySaverModeMediumLabel}" name="\${MemorySaverModeAggressiveness.MEDIUM}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
+             <div class="cr-secondary-text">
+               $i18n{memorySaverModeMediumDescription}
+             </div>
+           </controlled-radio-button>
+-          <controlled-radio-button id="aggressiveButton"
+-              label="$i18n{memorySaverModeAggressiveLabel}"
+-              name="\${MemorySaverModeAggressiveness.AGGRESSIVE}"
+-              pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
++          <controlled-radio-button id="aggressiveButton" label="$i18n{memorySaverModeAggressiveLabel}" name="\${MemorySaverModeAggressiveness.AGGRESSIVE}" pref-key="performance_tuning.high_efficiency_mode.aggressiveness">
+             <div class="cr-secondary-text">
+               $i18n{memorySaverModeAggressiveDescription}
+             </div>
+           </controlled-radio-button>
 "
 `;
 
@@ -2469,50 +2470,51 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 "===================================================================
 --- ../chrome/browser/resources/settings/settings_main/settings_main.html.ts
 +++ gen/chrome/browser/resources/settings/preprocessed/settings_main/settings_main.html.ts
-@@ -55,15 +55,9 @@
+@@ -57,15 +57,9 @@
      </div>
-   \` : '')}
+   \` : ''}
  
-   \${cache(this.showPage_(this.pageVisibility_?.performance) ? html\`
+   \${this.showPage_(this.pageVisibility_?.performance) ? html\`
 -    <div slot="view" id="performance">
--      \${cache(this.renderPlugin_(this.routes_.PERFORMANCE) ? html\`
+-      \${this.renderPlugin_(this.routes_.PERFORMANCE) ? html\`
 -        <settings-performance-page-index
 -            ?in-search-mode="\${this.inSearchMode_}">
 -        </settings-performance-page-index>
--      \` : '')}
+-      \` : ''}
 -    </div>
 +    
-   \` : '')}
+   \` : ''}
  
-   \${cache(this.showAiPage_(this.pageVisibility_?.ai) ? html\`
+   \${this.showAiPage_(this.pageVisibility_?.ai) ? html\`
      <div slot="view" id="ai">
-@@ -89,19 +83,19 @@
+@@ -91,9 +85,9 @@
        </settings-search-page-index>
-     \` : '')}
+     \` : ''}
    </div>
  
 -<if expr="not is_chromeos">
 +
-   \${cache(!this.settingsRefresh2026Enabled_ &&
-   this.showPage_(this.pageVisibility_?.defaultBrowser) ? html\`
+   \${!this.settingsRefresh2026Enabled_ &&
+           this.showPage_(this.pageVisibility_?.defaultBrowser) ?
+       html\`
      <div slot="view" id="defaultBrowser">
-       \${cache(this.renderPlugin_(this.routes_.DEFAULT_BROWSER) ? html\`
+@@ -101,10 +95,10 @@
          <settings-default-browser-page></settings-default-browser-page>
-       \` : '')}
+       \` : ''}
      </div>
-   \` : '')}
+   \` : ''}
 -</if>
  
 +
-   \${cache(!this.settingsRefresh2026Enabled_ &&
-   this.showPage_(this.pageVisibility_?.onStartup) ? html\`
+   \${!this.settingsRefresh2026Enabled_ &&
+           this.showPage_(this.pageVisibility_?.onStartup) ?
+       html\`
      <div slot="view" id="onStartup">
-       \${cache(this.renderPlugin_(this.routes_.ON_STARTUP) ? html\`
-@@ -112,16 +106,13 @@
+@@ -116,16 +110,13 @@
  
-   \${cache(this.showPage_(this.pageVisibility_?.languages) ? html\`
+   \${this.showPage_(this.pageVisibility_?.languages) ? html\`
      <div slot="view" id="languages">
-       \${cache(this.renderPlugin_(this.routes_.LANGUAGES) ? html\`
+       \${this.renderPlugin_(this.routes_.LANGUAGES) ? html\`
 -<if expr="is_chromeos">
 -        <settings-languages-page-index-cros>
 -        </settings-languages-page-index-cros>
@@ -2524,37 +2526,38 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
          </settings-languages-page-index>
 -</if>
 +
-       \` : '')}
+       \` : ''}
      </div>
-   \` : '')}
+   \` : ''}
  
-@@ -152,19 +143,19 @@
-       \` : '')}
+@@ -158,20 +149,20 @@
+       \` : ''}
      </div>
-   \` : '')}
+   \` : ''}
  
 -<if expr="not is_chromeos">
 +
-   \${cache(!this.settingsRefresh2026Enabled_ &&
-   this.showPage_(this.pageVisibility_?.system) ? html\`
+   \${!this.settingsRefresh2026Enabled_ &&
+           this.showPage_(this.pageVisibility_?.system) ?
+       html\`
      <div slot="view" id="system">
-       \${cache(this.renderPlugin_(this.routes_.SYSTEM) ? html\`
+       \${this.renderPlugin_(this.routes_.SYSTEM) ? html\`
 -        <settings-system-page></settings-system-page>
 +        <settings-brave-system-page-index></settings-brave-system-page-index>
-       \` : '')}
+       \` : ''}
      </div>
-   \` : '')}
+   \` : ''}
 -</if>
  
 +
-   \${cache(!this.settingsRefresh2026Enabled_ &&
-   this.showPage_(this.pageVisibility_?.reset) ? html\`
+   \${!this.settingsRefresh2026Enabled_ &&
+           this.showPage_(this.pageVisibility_?.reset) ?
+       html\`
      <div slot="view" id="reset">
-       \${cache(this.renderPlugin_(this.routes_.RESET) ? html\`
-@@ -178,7 +169,54 @@
+@@ -186,7 +177,54 @@
        <settings-about-page role="main" class="cr-centered-card-container">
        </settings-about-page>
-     \` : '')}
+     \` : ''}
    </div>
 -</cr-view-manager>
 +\${this.showPage_(this.pageVisibility_?.getStarted) ? html\`
@@ -2862,34 +2865,32 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 "===================================================================
 --- ../chrome/browser/resources/settings/site_settings/add_site_dialog.html.ts
 +++ gen/chrome/browser/resources/settings/preprocessed/site_settings/add_site_dialog.html.ts
-@@ -6,24 +6,18 @@
+@@ -6,12 +6,9 @@
    return html\`<!--_html_template_start_-->
-     <cr-dialog id="dialog" close-text="$i18n{close}">
-       <div slot="title">$i18n{addSiteTitle}</div>
-       <div slot="body">
--        <cr-input id="site" label="$i18n{addSite}"
--            placeholder="$i18n{addSiteExceptionPlaceholder}"
--            .value="\${this.site_}" @input="\${this.onInput_}"
--            error-message="\${this.errorMessage_}" spellcheck="false"
--            autofocus></cr-input>
--        <cr-checkbox id="incognito"
--            ?hidden="\${!this.showIncognitoSessionOnly_()}">
-+        <cr-input id="site" label="$i18n{addSite}" placeholder="\${this.category === 'braveShields' ? '$i18n{braveShieldsExampleTemplate}' : '$i18n{addSiteExceptionPlaceholder}'}" .value="\${this.site_}" @input="\${this.onInput_}" error-message="\${this.errorMessage_}" spellcheck="false" autofocus=""></cr-input>
-+        <cr-checkbox id="incognito" ?hidden="\${!this.showIncognitoSessionOnly_()}">
-           $i18n{incognitoSiteOnly}
-         </cr-checkbox>
-       </div>
-       <div slot="button-container">
-         <cr-button class="cancel-button" @click="\${this.onCancelClick_}">
-           $i18n{cancel}
-         </cr-button>
--        <cr-button class="action-button" id="add" @click="\${this.onSubmitClick_}"
--            disabled>
-+        <cr-button class="action-button" id="add" @click="\${this.onSubmitClick_}" disabled="">
-           $i18n{add}
-         </cr-button>
-       </div>
-     </cr-dialog>
+ <cr-dialog id="dialog" close-text="$i18n{close}">
+   <div slot="title">$i18n{addSiteTitle}</div>
+   <div slot="body">
+-    <cr-input id="site" label="$i18n{addSite}"
+-        placeholder="$i18n{addSiteExceptionPlaceholder}" .value="\${this.site_}"
+-        @input="\${this.onInput_}" error-message="\${this.errorMessage_}"
+-        spellcheck="false" autofocus>
++    <cr-input id="site" label="$i18n{addSite}" placeholder="\${this.category === 'braveShields' ? '$i18n{braveShieldsExampleTemplate}' : '$i18n{addSiteExceptionPlaceholder}'}" .value="\${this.site_}" @input="\${this.onInput_}" error-message="\${this.errorMessage_}" spellcheck="false" autofocus="">
+     </cr-input>
+     <cr-checkbox id="incognito" ?hidden="\${!this.showIncognitoSessionOnly_()}">
+       $i18n{incognitoSiteOnly}
+     </cr-checkbox>
+@@ -19,10 +16,9 @@
+   <div slot="button-container">
+     <cr-button class="cancel-button" @click="\${this.onCancelClick_}">
+       $i18n{cancel}
+     </cr-button>
+-    <cr-button class="action-button" id="add" @click="\${this.onSubmitClick_}"
+-        disabled>
++    <cr-button class="action-button" id="add" @click="\${this.onSubmitClick_}" disabled="">
+       $i18n{add}
+     </cr-button>
+   </div>
+ </cr-dialog>
 "
 `;
 
@@ -2898,22 +2899,21 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 --- ../chrome/browser/resources/settings/site_settings/site_list_entry.html
 +++ gen/chrome/browser/resources/settings/preprocessed/site_settings/site_list_entry.html
 @@ -1,5 +1,5 @@
--    <div class="list-item" focus-row-container>
-+<div class="list-item" focus-row-container>
+-    <div class="list-item">
++<div class="list-item">
        <div class="settings-row" role="row" aria-label="\${this.getAriaLabel_()}">
          <div role="gridcell" class="settings-row"
              @click="\${this.onOriginClick_}" id="originArea"
              aria-label="\${this.getAriaLabel_()}"
-@@ -47,12 +47,9 @@
+@@ -44,11 +44,9 @@
            </div>
          \` : ''}
          \${this.shouldShowResetButton_() ? html\`
            <div role="gridcell">
 -            <cr-icon-button id="resetSite" class="icon-delete-gray"
 -                @click="\${this.onResetButtonClick_}"
--                aria-label="\${this.getRemoveButtonAriaLabel_()}"
--                focus-row-control focus-type="reset">
-+            <cr-icon-button ?disabled="\${this.shouldDisableReset_()}" @mouseenter="\${this.onResetSiteMouseenter_}" id="resetSite" @click="\${this.onResetButtonClick_}" aria-label="\${this.getRemoveButtonAriaLabel_()}" focus-row-control="" focus-type="reset" iron-icon="trash">
+-                aria-label="\${this.getRemoveButtonAriaLabel_()}">
++            <cr-icon-button ?disabled="\${this.shouldDisableReset_()}" @mouseenter="\${this.onResetSiteMouseenter_}" id="resetSite" @click="\${this.onResetButtonClick_}" aria-label="\${this.getRemoveButtonAriaLabel_()}" iron-icon="trash">
              </cr-icon-button>
            </div>
          \` : ''}
@@ -3488,11 +3488,11 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 -      <img
 -          class="profile-avatar \${
 -              this.profileState.hasAvatarRing ? 'with-avatar-ring' : ''}"
--          alt="" .src="\${this.profileState.avatarIcon}">
+-          alt="" .src="\${this.profileState.avatarIcon}" draggable="false">
 -      <div id="iconContainer"
 -          ?hidden="\${!this.profileState.avatarBadge.length}">
 +      <img class="profile-avatar \${
-+              this.profileState.hasAvatarRing ? 'with-avatar-ring' : ''}" alt="" .src="\${this.profileState.avatarIcon}">
++              this.profileState.hasAvatarRing ? 'with-avatar-ring' : ''}" alt="" .src="\${this.profileState.avatarIcon}" draggable="false">
 +      <div id="iconContainer" ?hidden="\${!this.profileState.avatarBadge.length}">
          <cr-icon icon="\${this.profileState.avatarBadge}"></cr-icon>
        </div>
