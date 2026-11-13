@@ -111,6 +111,11 @@ Subcommands:
         uncommitted changes, running builds, the lift target, the steps the
         report records since the last `prepare`, and the step to carry on
         with (and on which branch, for a channel bump).
+    gerrit-upload N [--url URL] [--dry-run]
+        After `publish`: uploads origin/cr<N> to Gerrit as a relation chain of
+        CLs, on the base `publish` left as cr<N>'s upstream, and abandons the
+        CLs of commits that left it (see gerrit_upload.py). Refuses a chain
+        whose Change-Ids aren't one per commit. Nothing runs it yet.
     step N (--done OUTCOME | --skipped WHY)
         Records step N as done or skipped, as a `## Step N` report heading:
         for the checked-out channel bump branch, for the steps each channel
@@ -140,6 +145,7 @@ import _boot  # noqa: F401  -- adds parent tools/cr to sys.path
 from ci import github as ci_github  # noqa: E402  -- after _boot
 from ci import report as ci_report  # noqa: E402  -- after _boot
 from exceptions import RebaseNeededException  # noqa: E402  -- after _boot
+import gerrit_upload  # noqa: E402  -- after _boot
 import pinned_commits  # noqa: E402  -- after _boot
 import repository  # noqa: E402  -- after _boot
 from versioning import (  # noqa: E402  -- after _boot
@@ -379,6 +385,10 @@ class Commit:
 
     # An unquoted trailer: a revert or reland quotes the original's with `>`.
     _CHANGE_ID = re.compile(r'^[ \t]*Change-Id: (I[0-9a-f]{40})[ \t]*$', re.M)
+    # As `git log` quotes it, indented: the Brave commit's own trailer isn't.
+    _QUOTED_CHANGE_ID = re.compile(
+        r'^[ \t]+Change-Id: (I[0-9a-f]{40})[ \t]*$', re.M
+    )
 
     @classmethod
     def change_ids_in(cls, message: str) -> tuple[str, ...]:
@@ -390,7 +400,9 @@ class Commit:
         """The Change-Ids of a Brave commit's culprits, from the upstream
         messages its "Chromium changes:" block quotes."""
         _, found, quoted = message.partition('Chromium changes:')
-        return cls.change_ids_in(quoted) if found else ()
+        if not found:
+            return ()
+        return tuple(dict.fromkeys(cls._QUOTED_CHANGE_ID.findall(quoted)))
 
     def identities(self) -> list[str]:
         """Every name the upstream change goes by here: hashes and
@@ -4551,6 +4563,21 @@ def _cmd_pick_fix(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_gerrit_upload(args: argparse.Namespace) -> int:
+    """The base is the upstream `publish` left, fetched already."""
+    branch = f'cr{args.target}'
+    brave = repository.brave
+    base = brave.run_git('rev-parse', '--abbrev-ref', f'{branch}@{{upstream}}')
+    return gerrit_upload.upload(
+        cwd=brave.root,
+        gerrit=gerrit_upload.Gerrit(args.url),
+        branch=branch,
+        base=base,
+        head=f'origin/{branch}',
+        dry_run=args.dry_run,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     subparsers = parser.add_subparsers(dest='command', required=True)
@@ -4757,6 +4784,26 @@ def main() -> int:
         help="A milestone or a channel bump's tag; by default, the branch's.",
     )
     status.set_defaults(func=_cmd_status)
+
+    upload = subparsers.add_parser(
+        'gerrit-upload',
+        help="Upload the published cr<N> to Gerrit as a relation chain, and "
+        "abandon the CLs of commits that left it.",
+    )
+    upload.add_argument(
+        'target', metavar='milestone', type=int, help='e.g. 160'
+    )
+    upload.add_argument(
+        '--url',
+        default=gerrit_upload.DEFAULT_URL,
+        help='The Gerrit project, as an ssh:// URL.',
+    )
+    upload.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Only read Gerrit, and say what would change.',
+    )
+    upload.set_defaults(func=_cmd_gerrit_upload)
 
     step = subparsers.add_parser(
         'step', help='Record a finished or skipped step in the report.'

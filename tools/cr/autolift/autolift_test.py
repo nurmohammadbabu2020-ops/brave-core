@@ -504,6 +504,14 @@ class ChangeIdTest(unittest.TestCase):
         self.assertEqual(
             autolift.Commit.culprit_change_ids(message), (_CHANGE_ID,)
         )
+        own = 'I' + 'b' * 40
+        self.assertEqual(
+            autolift.Commit.culprit_change_ids(
+                f'{message}\nChange-Id: {own}\n'
+            ),
+            (_CHANGE_ID,),
+            msg="The commit's own Change-Id isn't a culprit's.",
+        )
 
     def test_a_commit_without_culprits_quotes_none(self):
         self.assertEqual(
@@ -1530,6 +1538,35 @@ class ReviewListTest(unittest.TestCase):
         self.assertEqual(
             self._review(pushed_over), ['Nothing to review: no commit changed.']
         )
+
+
+class GerritUploadCommandTest(unittest.TestCase):
+    def test_uploads_on_the_upstream_publish_left(self):
+        brave = mock.MagicMock(root=Path('/brave'))
+        brave.run_git.return_value = 'origin/master'
+        with (
+            mock.patch.object(autolift.repository, 'brave', brave),
+            mock.patch.object(
+                autolift.gerrit_upload, 'upload', return_value=0
+            ) as upload,
+        ):
+            status = autolift._cmd_gerrit_upload(
+                autolift.argparse.Namespace(
+                    target=160, url='ssh://gerrit/project', dry_run=True
+                )
+            )
+
+        self.assertEqual(status, 0)
+        brave.run_git.assert_called_once_with(
+            'rev-parse', '--abbrev-ref', 'cr160@{upstream}'
+        )
+        kwargs = upload.call_args.kwargs
+        self.assertEqual(
+            (kwargs['branch'], kwargs['base'], kwargs['head']),
+            ('cr160', 'origin/master', 'origin/cr160'),
+        )
+        self.assertEqual(kwargs['gerrit'].url, 'ssh://gerrit/project')
+        self.assertTrue(kwargs['dry_run'])
 
 
 class PublishWithoutRebaseTest(unittest.TestCase):

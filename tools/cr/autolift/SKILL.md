@@ -50,8 +50,7 @@ the working directory, and fail from `src/`.
 
 Run Python scripts and their tests with `vpython3`, never `python3`: the system
 Python lacks their dependencies. Run Brockit and Plaster as `brockit` and
-`plaster`, which are on the `PATH`, rather than through `tools/cr/brockit.py`
-and `tools/cr/plaster.py`.
+`plaster` (on the `PATH`), not through their `tools/cr/*.py`.
 
 ## Inputs
 
@@ -205,8 +204,9 @@ commit body and in the report. Then carry on.
   committed subject, add an `amend!` commit with
   `git commit --allow-empty -F <file>`: `amend! <old subject>`, a blank line,
   then the whole new message, prefixes included, and the original's "Chromium
-  changes:" block. The hook wraps nothing, so a `-m` body stays one line: write
-  the message wrapped, with `-F`. Wrap with
+  changes:" block, but not its `Change-Id`: `brockit rebase` keeps the target's.
+  The hook wraps nothing, so a `-m` body stays one line: write the message
+  wrapped, with `-F`. Wrap with
   `vpython3 ../agents/shared/skills/cl-description/scripts/wrap_lines.py <in> > <out>`:
   it takes the input's first line as the subject (dropping its final period),
   prints to stdout and drops trailing blank lines. It leaves a paragraph that
@@ -264,10 +264,12 @@ commit body and in the report. Then carry on.
   switches, initializers and enums. Prefer a precise plaster over a
   `#define X X_ChromiumImpl` token rewrite, which silently rewrites every later
   occurrence.
-- When a fix touches a `chromium_src` shadow that `#define`s into the upstream
-  file it includes, consider moving that `#define` to plaster: in the fix when
-  the move is simple, otherwise in a follow-up commit right after it, with
-  `git cr commit --tagged=plaster`.
+- When a fix changes anything in a `chromium_src` shadow that `#define`s into
+  the upstream file it includes, not only its `#define` lines, move those
+  `#define`s to plaster: in the fix when the move is simple, otherwise in a
+  follow-up commit right after it, with `git cr commit --tagged=plaster`. A move
+  that needs a redesign (a `_ChromiumImpl` rename spread over a class and its
+  delegate's header) goes in the report, with why it was left.
 - Converting to plaster covers the whole `.cc`/`.h` pair (both patches and the
   `#define`s in both shadows), and goes by the plaster docs above and
   `plaster --help` (not `.claude/skills/plaster-from-patch`, which is outdated).
@@ -379,10 +381,10 @@ commit body and in the report. Then carry on.
   the kill; "read 0 bytes: unexpected EOF" means the cache is corrupt, and
   removing one depfile only moves the failure. Retry once; after that, stop and
   ask for the cache to be cleared.
-- Run one build per checkout at a time. Before starting one, check that no
-  earlier build is still running there:
-  `pgrep -af "siso|autoninja" | grep "$(realpath ..)"`. A build from another
-  checkout is harmless.
+- Run one build per checkout at a time (an error about `build.guard` means two
+  overlapped). Before starting one, check that no earlier build is still running
+  there: `pgrep -af "siso|autoninja" | grep "$(realpath ..)"`. A build from
+  another checkout is harmless.
 - `brave/build/config/siso/brave_siso_config.star` is hardlinked into
   `src/build/config/siso/`. Editing tools that write atomically break the link,
   and the build then reads a stale copy. After editing it, run
@@ -637,6 +639,12 @@ them with the recipes below, `git add` them, and carry on with:
 brockit rebase --continue
 ```
 
+Mid-rebase, Brockit and the todo's `exec` lines run the base's older `tools/cr`.
+If `--continue` crashes in code the branch changed (cr160: "Cannot parse TODO
+line"), extract `origin/cr<N>:tools/cr` to `$TMPDIR/tc/src/brave/`, symlink
+`EXTRA_DEPS`, `vendor`, `third_party` and `src/third_party` beside it, point the
+`exec` lines at it and continue with its `brockit.py`.
+
 To drop the commit it stopped on, use `brockit rebase --skip`. Never use plain
 `git rebase --continue` or `--skip`: they skip Brockit's handling of the squash
 messages and its conflict rules for the rest of the rebase. When the rebase
@@ -788,6 +796,14 @@ Then fix:
     with `pnpm run update_patches <path>`, and commit with the culprit. Read the
     whole culprit, not just the conflicting hunk: it can change more that Brave
     relies on elsewhere.
+  - Either way the patch is raw, with no `rewrite/<path>.yaml`, and conflicts
+    again at the next bump. Once the lift is done, convert each one the
+    "Conflict-resolved patches" commit lists to plaster, with its `.h`/`.cc`
+    partner, in a follow-up commit (see
+    [Editing upstream code](#editing-upstream-code)), whatever the language:
+    plaster's regex works on any file. Keep the change as it is, so the upstream
+    file comes out byte-identical (`cmp` it against a copy taken before
+    `plaster apply`) and needs no rebuild.
 
 After `--continue` (or the first `lift`, when nothing needed action):
 
@@ -815,8 +831,9 @@ After `--continue` (or the first `lift`, when nothing needed action):
   `gnrt gen` write `brave/third_party/rust/<crate>/<epoch>/BUILD.gn`, and point
   Brave GN deps at the `//brave/third_party/rust/...` target. A Brave-owned copy
   is a `--tagged=WIP` decision (cr159: `base64` 0.22 after the 0.23 roll). Once
-  `vendor` and `gen` run clean with no diff, the lift is done; no separate
-  `gnrt` commit is needed.
+  `vendor` and `gen` run clean with no diff, the lift is done (no `gnrt`
+  commit). A `vendor` stopped by a base cause (cr160: `crunchy-0.2.2`) still
+  updates `Cargo.lock`: commit it with the roll's culprit.
 
 #### Minor bumps on a maintenance branch
 
@@ -896,9 +913,6 @@ and later errors often only follow from it. Loop:
    Brave files, and rebuild. For a changed upstream signature, `git grep` every
    Brave caller first and fix them together: the build stops at the first
    object, so each missed caller costs a round.
-
-If a log ends with an error about `out/Component/build.guard`, two builds
-overlapped. Make sure only one runs.
 
 To check one fix quickly, build just the targets it touches with the same
 command and flags, e.g. `--target=brave_unit_tests`,
@@ -1363,6 +1377,9 @@ patch whose hunks upstream already has.
   `OnTabAudioChanged()`): no build error, but Brave observers that reacted to it
   in the old callback go stale. Grep every Brave override of the old callback
   for what reads the moved state, and override the new one in each.
+- **A new non-virtual entry point beside a virtual Brave overrides** (cr160:
+  `TabStripCollection::RemoveTab()`): Brave's override silently stops running.
+  Find what callers use instead, `make_virtual` it and override it too.
 - **Brave overrides of a changed signature.** When a Brave `#define` declares an
   `_Unused` duplicate of an upstream method (`UpdateKeyPinsList`), update both
   declarations. If the new signature has a reply callback, run it, or callers
@@ -1413,6 +1430,11 @@ headers that lost the include
   (remote builds assert on a dir outside `src/`), and run
   `buildtools/linux64/gn gen $TMPDIR/<dir> --check --error-limit=5000` from
   `src/` (cr160: the consumers of the deleted `//chrome/test:test_support_ui`).
+  Android needs `PYTHONPATH=$(realpath brave/script)` in front.
+- **Scripts moved into `.pyz` archives** (`AssertionError` in
+  `get_chromium_src_override()` on a remote action): siso no longer uploads
+  their Python overrides. Add the archive to `brave_siso_config.star`'s
+  `__PYZ_CHROMIUM_SRC_OVERRIDDEN_MODULES`.
 - **Lost public include paths** (`gn check`: "Can't include this header from
   here" in a Brave target whose deps didn't change): a public chain to the
   header's target was cut. Find the commit that dropped it with
