@@ -47,15 +47,12 @@ substitutions:
       runtime. BraveManageSyncSettings drops this card anyway, but it can only
       do so after super.onCreatePreferences() has returned, and initialize()
       dereferences the account eagerly instead of at bind time.
-    regex:
-      re_pattern: |-
-        (private void setupCentralAccountCardPreference\(Profile profile\) \{)\n( *)
-      replace: |-
-        \1
-        \2if (getIdentityManager(profile).getPrimaryAccountInfo() == null) {
-        \2    return;
-        \2}
-        \2
+    add_after_line:
+      line: 'private void setupCentralAccountCardPreference(Profile profile) {'
+      code: |2-
+                if (getIdentityManager(profile).getPrimaryAccountInfo() == null) {
+                    return;
+                }
 
   - description: |-
       Never treat the page as signed out
