@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 9f7e202b43649d78eb2393e359988cd3b2968c91..8c029e85ceeb19e9cf6ffe7f5be66eb45ed54ad8 100644
+index 93de0493a740083dfc292804574b8bf4e4678744..108dd783116dcd463195bddb478c145af1f05fa7 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 @@ -863,6 +863,7 @@ public class MainSettings extends ChromeBaseSettingsFragment

@@ -1,8 +1,8 @@
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 44e33fe8aa4c8a87528330553ea11f776823912a..585f9c88f6c54263facf7a599f4c3926be7c5c0c 100644
+index db1024992d11f0793458c4f6a53d875e121cc02e..51f84c741d4c81edad70c3278f98ea08fc2a6276 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -998,6 +998,14 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -995,6 +995,14 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
  
                          private void closeIfNoTabsAndHomepageEnabled(
                                  boolean isPendingClosure, boolean shouldRemoveWindowWithZeroTabs) {
@@ -17,7 +17,7 @@ index 44e33fe8aa4c8a87528330553ea11f776823912a..585f9c88f6c54263facf7a599f4c3926
                              if (getTabModelSelector().getTotalTabCount() == 0) {
                                  if (shouldRemoveWindowWithZeroTabs) {
                                      mMultiInstanceManager.closeChromeWindowIfEmpty(mWindowId);
-@@ -4053,6 +4061,11 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -4021,6 +4029,11 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                  new TabModelSelectorObserver() {
                      @Override
                      public void onTabStateInitialized() {
@@ -29,7 +29,7 @@ index 44e33fe8aa4c8a87528330553ea11f776823912a..585f9c88f6c54263facf7a599f4c3926
                          if (mMultiInstanceManager != null) {
                              mMultiInstanceManager.onTabStateInitialized();
                          }
-@@ -5593,6 +5606,9 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -5547,6 +5560,9 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
      public void onSaveInstanceState(Bundle outState) {
          try (TraceEvent e = TraceEvent.scoped("ChromeTabbedActivity.onSaveInstanceState")) {
              super.onSaveInstanceState(outState);

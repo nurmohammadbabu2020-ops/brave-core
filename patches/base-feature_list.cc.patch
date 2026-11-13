@@ -1,5 +1,5 @@
 diff --git a/base/feature_list.cc b/base/feature_list.cc
-index 735fad0ac9a8b5e94425d3e5b54a7bf264868c9d..244d670404e5d9e471b9c2f1053ffd0d32855736 100644
+index 5f5c43c8dfb7e41b02a5563be50d39c8e4436258..32b2b0138087396e5f42f15fc9b9f761b57e4239 100644
 --- a/base/feature_list.cc
 +++ b/base/feature_list.cc
 @@ -762,6 +762,9 @@ base::flat_set<std::string> FeatureList::GetFeaturesAssociatedWithTrial(

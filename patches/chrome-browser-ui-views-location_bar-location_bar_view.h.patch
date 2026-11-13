@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/ui/views/location_bar/location_bar_view.h b/chrome/browser/ui/views/location_bar/location_bar_view.h
-index fa1e9c6db993e59bd1eb58ef38eb621972133fc1..799742af5d943c9eab749b230545d966207232ea 100644
+index 93970b803fdf179bd3de0e1f0ed9a6ca357a586d..324b5ec7d29b8a3f47235acf82817824af57f31c 100644
 --- a/chrome/browser/ui/views/location_bar/location_bar_view.h
 +++ b/chrome/browser/ui/views/location_bar/location_bar_view.h
-@@ -132,11 +132,11 @@ class LocationBarView
+@@ -133,11 +133,11 @@ class LocationBarView
    ~LocationBarView() override;
  
    // Returns the location bar border radius in DIPs.
@@ -16,7 +16,7 @@ index fa1e9c6db993e59bd1eb58ef38eb621972133fc1..799742af5d943c9eab749b230545d966
  
    bool in_popup_state_transition() const override;
  
-@@ -277,7 +277,7 @@ class LocationBarView
+@@ -279,7 +279,7 @@ class LocationBarView
  
    void OnOmniboxFocused();
    void OpenOmniboxPopup(bool query_zps = true);
@@ -25,7 +25,7 @@ index fa1e9c6db993e59bd1eb58ef38eb621972133fc1..799742af5d943c9eab749b230545d966
    // Returns true if Full WebUI Omnibox is enabled and ready to handle focus.
    bool IsFullWebUiOmniboxReady() const;
    // Returns whether the toolbar containing this location bar is visible.
-@@ -321,7 +321,12 @@ class LocationBarView
+@@ -329,7 +329,12 @@ class LocationBarView
  
    OmniboxPopupUI* GetOmniboxPopupUI();
  
@@ -38,7 +38,7 @@ index fa1e9c6db993e59bd1eb58ef38eb621972133fc1..799742af5d943c9eab749b230545d966
    FRIEND_TEST_ALL_PREFIXES(SecurityIndicatorTest, CheckIndicatorText);
    FRIEND_TEST_ALL_PREFIXES(TouchLocationBarViewBrowserTest,
                             OmniboxViewViewsSize);
-@@ -345,7 +350,7 @@ class LocationBarView
+@@ -353,7 +358,7 @@ class LocationBarView
    int GetMinimumLeadingWidth() const;
  
    // Returns the amount of space required to the right of the omnibox text.
@@ -47,7 +47,7 @@ index fa1e9c6db993e59bd1eb58ef38eb621972133fc1..799742af5d943c9eab749b230545d966
  
    // The LocationBarView bounds, without the ends which have a border radius.
    // E.g., if the LocationBarView was 50dip long, and the border radius was 2,
-@@ -353,7 +358,7 @@ class LocationBarView
+@@ -361,7 +366,7 @@ class LocationBarView
    gfx::Rect GetLocalBoundsWithoutEndcaps() const;
  
    // Updates the background on a theme change, or dropdown state change.

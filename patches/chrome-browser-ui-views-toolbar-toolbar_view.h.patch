@@ -1,5 +1,5 @@
 diff --git a/chrome/browser/ui/views/toolbar/toolbar_view.h b/chrome/browser/ui/views/toolbar/toolbar_view.h
-index ac6b8d0867e96893417269ae68d281b80d5caa20..908574c896c432295217e8aa19a3713d845c5166 100644
+index 3ed413abab76022aa1f475bae85c1f787a4eeae7..f8c68e960ae1978048089557d2ae238337c63e28 100644
 --- a/chrome/browser/ui/views/toolbar/toolbar_view.h
 +++ b/chrome/browser/ui/views/toolbar/toolbar_view.h
 @@ -121,13 +121,13 @@ class ToolbarView : public views::AccessiblePaneView,
@@ -48,7 +48,7 @@ index ac6b8d0867e96893417269ae68d281b80d5caa20..908574c896c432295217e8aa19a3713d
    FRIEND_TEST_ALL_PREFIXES(ToolbarViewCircularContextualTasksBrowserTest,
                             CircularButtonRetainsInteriorMarginsAndPosition);
    FRIEND_TEST_ALL_PREFIXES(ToolbarViewCircularContextualTasksBrowserTest,
-@@ -366,7 +373,7 @@ class ToolbarView : public views::AccessiblePaneView,
+@@ -365,7 +372,7 @@ class ToolbarView : public views::AccessiblePaneView,
    void OnChromeLabsPrefChanged();
  
    // Loads the images for all the child views.
