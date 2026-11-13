@@ -43,7 +43,7 @@ IN_PROC_BROWSER_TEST_F(BraveVPNControllerTest, InvokeUi_Dialog) {
 
 // The panel's page binds `ServiceHandler` itself, and observes the service
 // through it as it loads.
-IN_PROC_BROWSER_TEST_F(BraveVPNPanelControllerTest, PanelObservesVpnService) {
+IN_PROC_BROWSER_TEST_F(BraveVPNControllerTest, PanelObservesVpnService) {
   brave_vpn::BraveVpnService* service =
       brave_vpn::BraveVpnServiceFactory::GetForProfile(GetProfile());
   ASSERT_TRUE(service);
