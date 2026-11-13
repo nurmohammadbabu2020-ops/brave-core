@@ -2894,6 +2894,80 @@ exports[`mangled files should have up to date snapshots ./chromium_src/chrome/br
 "
 `;
 
+exports[`mangled files should have up to date snapshots ./chromium_src/chrome/browser/resources/settings/site_settings/site_list.html.lit_mangler.ts should match snapshot 1`] = `
+"===================================================================
+--- ../chrome/browser/resources/settings/site_settings/site_list.html
++++ gen/chrome/browser/resources/settings/preprocessed/site_settings/site_list.html
+@@ -6,33 +6,21 @@
+       <div class="cr-row first">
+         <h3 id="listHeader" class="flex secondary" tabindex="-1">
+           \${this.categoryHeader}
+         </h3>
+-        <cr-button id="addSite" class="header-aligned-button"
+-            ?hidden="\${!this.shouldShowAddSiteButton_()}"
+-            @click="\${this.onAddSiteClick_}"
+-            aria-label="\${this.getAddButtonLabel_()}">
++        <cr-button id="addSite" class="header-aligned-button" ?hidden="\${!this.shouldShowAddSiteButton_()}" @click="\${this.onAddSiteClick_}" aria-label="\${this.getAddButtonLabel_()}">
+           $i18n{add}
+         </cr-button>
+       </div>
+-      <div ?hidden="\${!this.shouldShowHeaderWarning_()}"
+-          id="systemPermissionDeclinedWarning" class="list-frame">
++      <div ?hidden="\${!this.shouldShowHeaderWarning_()}" id="systemPermissionDeclinedWarning" class="list-frame">
+         <div class="list-item secondary">
+           <div id="systemPermissionWarningText"></div>
+         </div>
+       </div>
+       <cr-action-menu id="actionMenu" role-description="$i18n{menu}">
+-        <button class="dropdown-item" id="allow" @click="\${this.onAllowClick_}"
+-            ?hidden="\${!this.showAllowAction_}">
+-          $i18n{siteSettingsActionAllow}
+-        </button>
+-        <button class="dropdown-item" id="block" @click="\${this.onBlockClick_}"
+-            ?hidden="\${!this.showBlockAction_}">
+-          $i18n{siteSettingsActionBlock}
+-        </button>
+-        <button class="dropdown-item" id="sessionOnly"
+-            @click="\${this.onSessionOnlyClick_}"
+-            ?hidden="\${!this.shouldShowSessionOnlyActionForSite_()}">
++        <button class="dropdown-item" id="allow" @click="\${this.onAllowClick_}" ?hidden="\${!this.showAllowAction_}">\${this.getAllowButtonLabel_()}</button>
++        <button class="dropdown-item" id="block" @click="\${this.onBlockClick_}" ?hidden="\${!this.showBlockAction_}">\${this.getBlockButtonLabel_()}</button>
++        <button class="dropdown-item" id="sessionOnly" @click="\${this.onSessionOnlyClick_}" ?hidden="\${!this.shouldShowSessionOnlyActionForSite_()}">
+           $i18n{siteSettingsActionSessionOnly}
+         </button>
+         <button class="dropdown-item" id="edit" @click="\${this.onEditClick_}">
+           $i18n{edit}
+@@ -47,13 +35,10 @@
+       </div>
+       <div class="list-frame" ?hidden="\${!this.shouldShowNoSearchResults_()}">
+         <div class="list-item secondary">$i18n{searchNoResults}</div>
+       </div>
+-      <div class="list-frame menu-content vertical-list" id="listContainer"
+-          ?hidden="\${!this.hasSites_()}">
+-        <settings-focus-list-container id="list" role="grid"
+-            aria-labelledby="listHeader"
+-            aria-describedby="\${this.categoryHeader}">
++      <div class="list-frame menu-content vertical-list" id="listContainer" ?hidden="\${!this.hasSites_()}">
++        <settings-focus-list-container id="list" role="grid" aria-labelledby="listHeader" aria-describedby="\${this.categoryHeader}">
+           \${this.filteredSites_.map((item, index) => html\`
+             <site-list-entry .model="\${item}"
+                 ?read-only-list="\${this.readOnlyList}"
+                 @show-action-menu="\${this.onShowActionMenu_}"
+@@ -68,10 +53,9 @@
+           \`)}
+         </settings-focus-list-container>
+       </div>
+     </div>
+-    <cr-tooltip id="tooltip" ?hidden="\${!this.tooltipText_}"
+-        fit-to-visible-bounds manual-mode position="top">
++    <cr-tooltip id="tooltip" ?hidden="\${!this.tooltipText_}" fit-to-visible-bounds="" manual-mode="" position="top">
+       \${this.tooltipText_}
+     </cr-tooltip>
+     \${this.showEditExceptionDialog_ ? html\`
+       <settings-edit-exception-dialog .model="\${this.actionMenuSite_!}"
+"
+`;
+
 exports[`mangled files should have up to date snapshots ./chromium_src/chrome/browser/resources/settings/site_settings/site_list_entry.html.lit_mangler.ts should match snapshot 1`] = `
 "===================================================================
 --- ../chrome/browser/resources/settings/site_settings/site_list_entry.html
